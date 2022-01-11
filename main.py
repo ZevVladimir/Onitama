@@ -197,14 +197,6 @@ def check_piece_there(there):
     global origin
     global current_click
 
-    if red_turn and current_click == 2:
-        if current_board[there] == red_student or current_board[there] == red_master:
-            current_click = 1
-            
-    elif not red_turn and current_click == 2:
-         if current_board[there] == blue_student or current_board[there] == blue_master:
-            current_click = 1
-
     if current_click < 2:
         if red_turn:
             if current_board[there] == empty_square:
@@ -227,6 +219,8 @@ def check_piece_there(there):
                 win = "Red"
                 win_game(win)
                 return True
+            elif current_board[there] == red_student or current_board[there] == red_master:
+                return False
         if not red_turn:
             if current_board[there] == empty_square:
                 return True
@@ -236,6 +230,8 @@ def check_piece_there(there):
                 win = "Blue"
                 win_game(win)
                 return True
+            elif current_board[there] == blue_student or current_board[there] == blue_master:
+                return False
 
 
 def check_mouse_pos(cur_x, cur_y, what_click):
@@ -275,7 +271,6 @@ def check_mouse_pos(cur_x, cur_y, what_click):
                         # if the click was on one of the squares and a card has been selected determine what piece is there
                         if check_piece_there(i):
                             highlight = possible_moves(i)
-                            print("HI")
                             for j in range(0, len(highlight)):
                                 if current_card == 0 or current_card == 3:
                                     print(highlight)
@@ -293,6 +288,16 @@ def check_mouse_pos(cur_x, cur_y, what_click):
                                 if highlight[p] == i:
                                     move_piece(current_piece, highlight[p], current_card)
                                     current_click = 0
+                        elif not check_piece_there(i):
+                            highlight = possible_moves(i)
+                            for j in range(0, len(highlight)):
+                                if current_card == 0 or current_card == 3:
+                                    print(highlight)
+                                    new_board[highlight[j]] = ORANGE
+                                elif current_card == 1 or current_card == 4:
+                                    new_board[highlight[j]] = PURPLE
+                            current_piece = i
+                            update_board(new_board)
     
 
 
