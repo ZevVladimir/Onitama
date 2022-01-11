@@ -3,12 +3,15 @@ import sys
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
+YELLOW = (238, 232, 170)
 PURPLE = (138, 43, 226)
 ORANGE = (255, 127, 80)
 
 height = 3000
 width = 3000
 size = 2000 / 5
+current_click = 0
+current_card = -1
 red_turn = True  # defines that red starts first
 listOfCenter = []
 red_student = ['r', 's']
@@ -17,6 +20,7 @@ blue_student = ['b', 's']
 blue_master = ["b", "m"]
 empty_square = ["", ""]
 square_pos = []
+square_color = []
 
 # load pictures for cards
 boar = pygame.image.load("boar.jpg")
@@ -40,6 +44,12 @@ current_board = [red_student, red_student, red_master, red_student, red_student,
                  empty_square, empty_square, empty_square, empty_square, empty_square,
                  blue_student, blue_student, blue_master, blue_student, blue_student]
 
+square_color = [BLACK, WHITE, YELLOW, WHITE, BLACK,
+                WHITE, BLACK, WHITE, BLACK, WHITE,
+                BLACK, WHITE, BLACK, WHITE, BLACK,
+                WHITE, BLACK, WHITE, BLACK, WHITE,
+                BLACK, WHITE, YELLOW, WHITE, BLACK,]
+
 
 # create list of range of x's and range of y's for each square in from of list so total list contains lists which have two tuples (one is x one is y)
 for num in range(0, 5):
@@ -51,69 +61,101 @@ card_pos = [[(2000, 2715), (0, size)], [(2000, 2715), (size, 2*size)], [(2000, 2
 
 
 def boar_move(square):  # define all moves: take current square then return possible coordinates of movement
-    cur_pos_x, tup_x = square_pos[square][0]
-    cur_pos_y, tup_y = square_pos[square][1]
     boar_set = []
     if red_turn:
-        boar_set = [[cur_pos_x - size, cur_pos_y], [cur_pos_x + size, cur_pos_y], [cur_pos_x, cur_pos_y + size]]
+        boar_set = [(square + 5), (square + 1), (square - 1)]
     elif not red_turn:
-        boar_set = [[cur_pos_x + size, cur_pos_y], [cur_pos_x - size, cur_pos_y], [cur_pos_x, cur_pos_y - size]]
+        boar_set = [(square - 5), (square + 1), (square - 1)]
 
     return boar_set
 
 
 def crab_move(square):
-    cur_pos_x, tup_x = square_pos[square][0]
-    cur_pos_y, tup_y = square_pos[square][1]
     crab_set = []
 
     if red_turn:
-        crab_set = [[cur_pos_x - 2 * size, cur_pos_y], [cur_pos_x, cur_pos_y - size], [cur_pos_x + 2 * size, cur_pos_y]]
+        crab_set = [(square + 2), (square - 2), (square + 5)]
     elif not red_turn:
-        crab_set = [[cur_pos_x + 2 * size, cur_pos_y], [cur_pos_x, cur_pos_y + size], [cur_pos_x - 2 * size, cur_pos_y]]
+        crab_set = [(square + 2), (square - 2), (square - 5)]
 
     return crab_set
 
 
 def horse_move(square):
-    cur_pos_x, tup_x = square_pos[square][0]
-    cur_pos_y, tup_y = square_pos[square][1]
     horse_set = []
 
     if red_turn:
-        horse_set = [[cur_pos_x - size, cur_pos_y], [cur_pos_x, cur_pos_y - size], [cur_pos_x, cur_pos_y + size]]
+        horse_set = [(square - 1), (square - 5), (square + 5)]
     elif not red_turn:
-        horse_set = [[cur_pos_x + size, cur_pos_y], [cur_pos_x, cur_pos_y + size], [cur_pos_x, cur_pos_y - size]]
+        horse_set = [(square + 5), (square - 5), (square + 1)]
 
     return horse_set
 
 
 def ox_move(square):
-    cur_pos_x, tup_x = square_pos[square][0]
-    cur_pos_y, tup_y = square_pos[square][1]
+    print("square:" + str(square))
     ox_set = []
 
     if red_turn:
-        ox_set = [[cur_pos_x + size, cur_pos_y], [cur_pos_x, cur_pos_y - size], [cur_pos_x, cur_pos_y + size]]
+        ox_set = [(square + 1), (square - 5), (square + 5)]
     elif not red_turn:
-        ox_set = [[cur_pos_x - size, cur_pos_y], [cur_pos_x, cur_pos_y + size], [cur_pos_x, cur_pos_y - size]]
+        ox_set = [(square - 1), (square - 5), (square + 5)]
 
     return ox_set
 
 
 def tiger_move(square):
-    cur_pos_x, tup_x = square_pos[square][0]
-    cur_pos_y, tup_y = square_pos[square][1]
     tiger_set = []
 
     if red_turn:
-        tiger_set = [[cur_pos_x, cur_pos_y - size], [cur_pos_x, cur_pos_y + 2 * size]]
+        tiger_set = [(square - 5), (square + 10)]
     elif not red_turn:
-        tiger_set = [[cur_pos_x, cur_pos_y + size], [cur_pos_x, cur_pos_y - 2 * size]]
+        tiger_set = [(square + 5) (square - 10)]
     return tiger_set
 
 
 card_order = [ox, tiger, boar, crab, horse]
+
+
+def possible_moves(begin):  # create list of what moves can be done based on what cards are available to red or blue
+    global current_card
+    pos_move_set = []
+    full_move_set = []
+
+    
+    #  depending what the current card order is add moves to set of what player can do
+    if card_order[current_card] == ox:
+        pos_move_set.append(ox_move(begin))
+    elif card_order[current_card] == tiger:
+        pos_move_set.append(tiger_move(begin))
+    elif card_order[current_card] == boar:
+        pos_move_set.append(boar_move(begin))
+    elif card_order[current_card] == crab:
+        pos_move_set.append(crab_move(begin))
+    elif card_order[current_carda] == horse:
+        pos_move_set.append(horse_move(begin))
+    pos_move_set.append(None)
+
+    pos_move_set = list(filter(None, pos_move_set))
+    print(pos_move_set)
+    for b in range(0, len(pos_move_set)):
+        for c in range(0, len(pos_move_set[b])):
+            full_move_set.append(pos_move_set[b][c])
+    print(full_move_set)
+    # determines if a possible move will be onto a piece of the same color and removes that move
+    for d in range(0, len(full_move_set)):
+        if full_move_set[d] < 0:
+            full_move_set[d] = None
+        elif red_turn:
+            if current_board[full_move_set[d]] == red_master or current_board[full_move_set[d]] == red_student:
+                full_move_set[d] = None
+        elif not red_turn:
+            if current_board[full_move_set[d]] == blue_master or current_board[full_move_set[d]] == blue_student:
+                full_move_set[d] = None
+    
+    full_move_set = list(filter(None, full_move_set))  # remove all the Nones
+    print(full_move_set)
+    return full_move_set
 
 
 def update_board():
@@ -124,18 +166,12 @@ def update_board():
     center_x = 0
     board.fill(BLACK)
     # create alternating white/black chess board pattern for 5x5 grid
-    for x in range(0, 5, 1):
-        for y in range(0, 5, 1):
-            if update_controller % 2 == 0:
-                rect_1 = pygame.draw.rect(board, BLACK, (x * size, y * size, size, size))
-                center = rect_1.center
-                listOfCenter.append(center)
-            else:
-                pygame.draw.rect(board, WHITE, (x * size, y * size, size, size))
+    for y in range(0, 5, 1):
+        for x in range(0, 5, 1):
+            rect_1 = pygame.draw.rect(board, square_color[update_controller], (x * size, y * size, size, size))
+            center = rect_1.center
+            listOfCenter.append(center)
             update_controller += 1
-
-    pygame.draw.rect(board, (238, 232, 170), (2 * size, 0, size, size))
-    pygame.draw.rect(board, (238, 232, 170), (2 * size, 4 * size, size, size))
 
     # place pieces on board based on list of where pieces are make sure they are centered in their square
     for i in range(0, len(current_board)):
@@ -159,7 +195,7 @@ def update_board():
         if center_x == 5:
             center_x = 0
 
-    # colors cards depending on which team can use them
+    # flips cards depending on which team can use them
     for m in range(0, 5):
         card_order_copy = card_order.copy()
         if m < 2:
@@ -169,6 +205,85 @@ def update_board():
             window.blit(card_order_copy[m], (5 * size, m * size))
         if m == 2:
             window.blit(card_order_copy[m], (5.5 * size, m * size))
+
+def check_piece_there(there):
+    global start
+    global origin
+    global pos_move_one
+    global pos_move_two
+
+   
+    if current_board[there] == empty_square:
+        return False
+    elif current_board[there] == red_student or current_board[there] == blue_student:
+        return True
+    """ elif current_board[there] == red_master and current_board[start] != red_student and current_board[start] != red_master:
+        win = "Red"
+        win_game(win)
+    elif current_board[there] == blue_master and current_board[start] != blue_student and current_board[start] != blue_master:
+        win = "Blue"
+        win_game(win) """
+
+def check_mouse_pos(cur_x, cur_y, what_click):
+    global current_click
+    global current_card
+    # determines if the click was on one of the cards
+
+    for k in range(0, len(card_pos)):
+        c_low_range_x, c_high_range_x = card_pos[k][0]
+        c_low_range_y, c_high_range_y = card_pos[k][1]
+        if c_low_range_x <= cur_x <= c_high_range_x and c_low_range_y <= cur_y <= c_high_range_y:
+            if red_turn and k < 2:
+                current_click = 1
+                current_card = k
+                return k
+            if not red_turn and k > 1:
+                current_click = 1 
+                current_card = k
+                return k
+
+    # determines if the click was on one of the squares
+    if current_click == 1: 
+        for i in range(0, len(square_pos)):
+            low_range_x, high_range_x = square_pos[i][0]
+            low_range_y, high_range_y = square_pos[i][1]
+
+            if low_range_x <= cur_x <= high_range_x:
+                if low_range_y <= cur_y <= high_range_y:
+                    # if the click was on one of the squares and a card has been selected determine what piece is there
+                    if check_piece_there(i):
+                        print(possible_moves(i))
+                    current_click = 2
+                    return i
+    
+
+
+""" 
+def check_move():
+        for r in range(0, len(pos_move_one)):
+            pot_x, tup_x = square_pos[pos_move_one[r]][0]
+            pot_y, tup_y = square_pos[pos_move_one[r]][1]
+            pot_x += 1
+            if pot_y >= 2000:
+                pot_y -= 1
+            else:
+                pot_y += 1
+            if check_mouse_pos(pot_x, pot_y, -1) == there:
+                move_piece(start, there, 0)
+                return
+
+        for r in range(0, len(pos_move_two)):
+            pot_x, tup_x = square_pos[pos_move_two[r]][0]
+            pot_y, tup_y = square_pos[pos_move_two[r]][1]
+            pot_x += 1
+            if pot_y >= 2000:
+                pot_y -= 1
+            else:
+                pot_y += 1
+            if check_mouse_pos(pot_x, pot_y, -1) == there:
+                move_piece(start, there, 1)  """
+def win_game(winner):
+    print(winner + " won!")
 
 
 def main():
@@ -183,13 +298,14 @@ def main():
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 pos = pygame.mouse.get_pos()
                 x, y = pos
+                check_mouse_pos(x, y, 1)
 
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
                 pos = pygame.mouse.get_pos()
                 x, y = pos
+                check_mouse_pos(x, y, 3)
 
         window.blit(board, board.get_rect())
         pygame.display.update()
-
 
 main()
