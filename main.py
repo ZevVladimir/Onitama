@@ -82,7 +82,6 @@ def movement(left, right, up, down, square):
         move_set.append(square + right)
     move_set.append(square + up)
     move_set.append(square - down)
-
     return move_set
 
 # TODO figure out how to deal with squares on the sides 
@@ -190,7 +189,6 @@ def move_piece(begin, finish, used):
 
 
     red_turn = not red_turn
-    print(red_turn)
     update_board(square_color)
 
 
@@ -199,13 +197,26 @@ def check_piece_there(there):
     global origin
     global current_click
 
+    if red_turn and current_click == 2:
+        if current_board[there] == red_student or current_board[there] == red_master:
+            current_click = 1
+            
+    elif not red_turn and current_click == 2:
+         if current_board[there] == blue_student or current_board[there] == blue_master:
+            current_click = 1
+
     if current_click < 2:
-        if current_board[there] == empty_square:
-            return False
-        elif current_board[there] == red_student or current_board[there] == blue_student:
-            return True
-        elif current_board[there] == red_master or current_board[there] == blue_master:
-            return True
+        if red_turn:
+            if current_board[there] == empty_square:
+                return False
+            elif current_board[there] == red_student or current_board[there] == blue_student:
+                return True
+        if not red_turn:
+            if current_board[there] == empty_square:
+                return False
+            elif current_board[there] == blue_student or current_board[there] == blue_master:
+                return True
+       
     elif current_click == 2:
         if red_turn:
             if current_board[there] == empty_square:
@@ -257,14 +268,17 @@ def check_mouse_pos(cur_x, cur_y, what_click):
 
             if low_range_x <= cur_x <= high_range_x:
                 if low_range_y <= cur_y <= high_range_y:
+                    
                     highlight = possible_moves(i)
                     if current_click == 1:
+                        print(check_piece_there(i))
                         # if the click was on one of the squares and a card has been selected determine what piece is there
                         if check_piece_there(i):
                             highlight = possible_moves(i)
-
+                            print("HI")
                             for j in range(0, len(highlight)):
                                 if current_card == 0 or current_card == 3:
+                                    print(highlight)
                                     new_board[highlight[j]] = ORANGE
                                 elif current_card == 1 or current_card == 4:
                                     new_board[highlight[j]] = PURPLE
@@ -282,31 +296,6 @@ def check_mouse_pos(cur_x, cur_y, what_click):
     
 
 
-
-""" 
-def check_move():
-        for r in range(0, len(pos_move_one)):
-            pot_x, tup_x = square_pos[pos_move_one[r]][0]
-            pot_y, tup_y = square_pos[pos_move_one[r]][1]
-            pot_x += 1
-            if pot_y >= 2000:
-                pot_y -= 1
-            else:
-                pot_y += 1
-            if check_mouse_pos(pot_x, pot_y, -1) == there:
-                move_piece(start, there, 0)
-                return
-
-        for r in range(0, len(pos_move_two)):
-            pot_x, tup_x = square_pos[pos_move_two[r]][0]
-            pot_y, tup_y = square_pos[pos_move_two[r]][1]
-            pot_x += 1
-            if pot_y >= 2000:
-                pot_y -= 1
-            else:
-                pot_y += 1
-            if check_mouse_pos(pot_x, pot_y, -1) == there:
-                move_piece(start, there, 1)  """
 def win_game(winner):
     print(winner + " won!")
 
