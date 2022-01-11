@@ -115,7 +115,7 @@ def tiger_move(square):
 
 card_order = [ox, tiger, boar, crab, horse]
 
-
+# TODO figure out how to deal with squares on the sides 
 def possible_moves(begin):  # create list of what moves can be done based on what cards are available to red or blue
     global current_card
     pos_move_set = []
@@ -131,7 +131,7 @@ def possible_moves(begin):  # create list of what moves can be done based on wha
         pos_move_set.append(boar_move(begin))
     elif card_order[current_card] == crab:
         pos_move_set.append(crab_move(begin))
-    elif card_order[current_carda] == horse:
+    elif card_order[current_card] == horse:
         pos_move_set.append(horse_move(begin))
     pos_move_set.append(None)
 
@@ -142,6 +142,8 @@ def possible_moves(begin):  # create list of what moves can be done based on wha
     # determines if a possible move will be onto a piece of the same color and removes that move
     for d in range(0, len(full_move_set)):
         if full_move_set[d] < 0:
+            full_move_set[d] = None
+        elif full_move_set[d] > 24:
             full_move_set[d] = None
         elif red_turn:
             if current_board[full_move_set[d]] == red_master or current_board[full_move_set[d]] == red_student:
