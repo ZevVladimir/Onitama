@@ -93,7 +93,6 @@ def horse_move(square):
 
 
 def ox_move(square):
-    print("square:" + str(square))
     ox_set = []
 
     if red_turn:
@@ -137,11 +136,9 @@ def possible_moves(begin):  # create list of what moves can be done based on wha
     pos_move_set.append(None)
 
     pos_move_set = list(filter(None, pos_move_set))
-    print(pos_move_set)
     for b in range(0, len(pos_move_set)):
         for c in range(0, len(pos_move_set[b])):
             full_move_set.append(pos_move_set[b][c])
-    print(full_move_set)
     # determines if a possible move will be onto a piece of the same color and removes that move
     for d in range(0, len(full_move_set)):
         if full_move_set[d] < 0:
@@ -154,11 +151,10 @@ def possible_moves(begin):  # create list of what moves can be done based on wha
                 full_move_set[d] = None
     
     full_move_set = list(filter(None, full_move_set))  # remove all the Nones
-    print(full_move_set)
     return full_move_set
 
 
-def update_board():
+def update_board(color_order):
     update_controller = 0
     half_size = size / 2
     quarter_size = size / 4
@@ -168,7 +164,7 @@ def update_board():
     # create alternating white/black chess board pattern for 5x5 grid
     for y in range(0, 5, 1):
         for x in range(0, 5, 1):
-            rect_1 = pygame.draw.rect(board, square_color[update_controller], (x * size, y * size, size, size))
+            rect_1 = pygame.draw.rect(board, color_order[update_controller], (x * size, y * size, size, size))
             center = rect_1.center
             listOfCenter.append(center)
             update_controller += 1
@@ -227,6 +223,9 @@ def check_piece_there(there):
 def check_mouse_pos(cur_x, cur_y, what_click):
     global current_click
     global current_card
+    global square_color
+    highlight = []
+    new_board = square_color.copy()
     # determines if the click was on one of the cards
 
     for k in range(0, len(card_pos)):
@@ -236,10 +235,12 @@ def check_mouse_pos(cur_x, cur_y, what_click):
             if red_turn and k < 2:
                 current_click = 1
                 current_card = k
+                update_board(square_color)
                 return k
             if not red_turn and k > 1:
                 current_click = 1 
                 current_card = k
+                update_board(square_color)
                 return k
 
     # determines if the click was on one of the squares
@@ -252,8 +253,18 @@ def check_mouse_pos(cur_x, cur_y, what_click):
                 if low_range_y <= cur_y <= high_range_y:
                     # if the click was on one of the squares and a card has been selected determine what piece is there
                     if check_piece_there(i):
-                        print(possible_moves(i))
-                    current_click = 2
+                        highlight = possible_moves(i)
+
+                        print(highlight)
+                        for j in range(0, len(highlight)):
+                            if current_card == 0 or current_card == 2:
+                                new_board[highlight[j]] = ORANGE
+                            elif current_card == 1 or current_card == 3:
+                                new_board[highlight[j]] = PURPLE
+                        
+                        update_board(new_board)
+
+                    # current_click = 2
                     return i
     
 
@@ -287,7 +298,8 @@ def win_game(winner):
 
 
 def main():
-    update_board()
+    global square_color
+    update_board(square_color)
     while True:
         pygame.time.delay(50)
         for event in pygame.event.get():
