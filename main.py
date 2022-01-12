@@ -1,6 +1,7 @@
 import pygame
 import tkinter
 from tkinter import messagebox
+import random
 import sys
 
 BLACK = (0, 0, 0)
@@ -25,14 +26,26 @@ empty_square = ["", ""]
 square_pos = []
 square_color = []
 highlight = []
+card_order = []
 
 # load pictures for cards
-boar = pygame.image.load("boar.jpg")
+tiger = pygame.image.load("tiger.jpg")
+frog = pygame.image.load("frog.jpg")
+rabbit = pygame.image.load("rabbit.jpg")
 crab = pygame.image.load("crab.jpg")
+elephant = pygame.image.load("elephant.jpg")
+goose = pygame.image.load("goose.jpg")
+rooster = pygame.image.load("rooster.jpg")
+monkey = pygame.image.load("monkey.jpg")
+mantis = pygame.image.load("mantis.jpg")
 horse = pygame.image.load("horse.jpg")
 ox = pygame.image.load("ox.jpg")
-tiger = pygame.image.load("tiger.jpg")
-monkey = pygame.image.load("monkey.jpg")
+crane = pygame.image.load("crane.jpg")
+boar = pygame.image.load("boar.jpg")
+eel = pygame.image.load("eel.jpg")
+cobra = pygame.image.load("cobra.jpg")
+
+all_cards = [tiger, frog, rabbit, crab, elephant, goose, rooster, monkey, mantis, horse, ox, crane, boar, eel, cobra]
 
 # create window
 window = pygame.display.set_mode((height, width))
@@ -65,9 +78,14 @@ for num in range(0, 5):
 card_pos = [[(2000, 2715), (0, size)], [(2000, 2715), (size, 2*size)], [(2000, 2715),
             (3*size, 4*size)], [(2000, 2715), (4*size, 5*size)]]
 
+# Randomize what cards are chosen for each game
+all_cards_copy = all_cards.copy()
+for p in range(0, 5):
+    
+    add = random.randint(0, len(all_cards_copy) - 1)
+    card_order.append(all_cards_copy[add])
+    all_cards_copy.pop(add)
 
-
-card_order = [ox, tiger, boar, crab, monkey]
 
 def distance_to_edge(current):
     test = current
@@ -195,18 +213,40 @@ def possible_moves(begin):  # create list of what moves can be done based on wha
 
     
     #  depending what the current card order is add moves to set of what player can do
-    if card_order[current_card] == ox:
-        pos_move_set.append(movement(1, 0, 5, 5, 0, 0, 0, 0, begin))
-    elif card_order[current_card] == tiger:
+    # order goes: left, right, up, down, up left diag, down right diag, up right diag, down left diag
+    if card_order[current_card] == tiger:
         pos_move_set.append(movement(0, 0, 10, 5, 0, 0, 0, 0, begin))
-    elif card_order[current_card] == boar:
-        pos_move_set.append(movement(1, 1, 5, 0, 0, 0, 0, 0, begin)) 
+    elif card_order[current_card] == frog:
+        pos_move_set.append(movement(2, 0, 0, 0, 1, 1, 0, 0, begin))
+    elif card_order[current_card] == rabbit:
+        pos_move_set.append(movement(0, 2, 0, 0, 0, 0, 1, 1, begin))
     elif card_order[current_card] == crab:
         pos_move_set.append(movement(2, 2, 5, 0, 0, 0, 0, 0, begin))
-    elif card_order[current_card] == horse:
-        pos_move_set.append(movement(0, 1, 5, 5, 0, 0, 0, 0, begin))
+    elif card_order[current_card] == elephant:
+        pos_move_set.append(movement(1, 1, 0, 0, 1, 0, 1, 0, begin))
+    elif card_order[current_card] == goose:
+        pos_move_set.append(movement(1, 1, 0, 0, 1, 1, 0, 0, begin))
+    elif card_order[current_card] == rooster:
+        pos_move_set.append(movement(1, 1, 0, 0, 0, 0, 1, 1, begin))
     elif card_order[current_card] == monkey:
         pos_move_set.append(movement(0, 0, 0, 0, 1, 1, 1, 1, begin))
+    elif card_order[current_card] == mantis:
+        pos_move_set.append(movement(0, 0, 0, 1, 1, 0, 1, 0, begin))
+    elif card_order[current_card] == horse:
+        pos_move_set.append(movement(0, 1, 5, 5, 0, 0, 0, 0, begin))
+    elif card_order[current_card] == ox:
+        pos_move_set.append(movement(1, 0, 5, 5, 0, 0, 0, 0, begin))
+    elif card_order[current_card] == crane:
+        pos_move_set.append(movement(0, 0, 1, 0, 0, 1, 0, 1, begin))
+    elif card_order[current_card] == boar:
+        pos_move_set.append(movement(1, 1, 5, 0, 0, 0, 0, 0, begin))
+    elif card_order[current_card] == eel:
+        pos_move_set.append(movement(0, 1, 0, 0, 1, 0, 0, 1, begin))
+    elif card_order[current_card] == cobra:
+        pos_move_set.append(movement(1, 0, 0, 0, 0, 1, 1, 0, begin))
+    
+    
+    
     # pos_move_set.append(None)
 
     pos_move_set = list(filter(None, pos_move_set))
