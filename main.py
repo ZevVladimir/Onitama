@@ -32,6 +32,7 @@ crab = pygame.image.load("crab.jpg")
 horse = pygame.image.load("horse.jpg")
 ox = pygame.image.load("ox.jpg")
 tiger = pygame.image.load("tiger.jpg")
+monkey = pygame.image.load("monkey.jpg")
 
 # create window
 window = pygame.display.set_mode((height, width))
@@ -66,30 +67,122 @@ card_pos = [[(2000, 2715), (0, size)], [(2000, 2715), (size, 2*size)], [(2000, 2
 
 
 
-card_order = [ox, tiger, boar, crab, horse]
+card_order = [ox, tiger, boar, crab, monkey]
 
-def movement(left, right, up, down, square):
+def distance_to_edge(current):
+    test = current
+    distance_left = 0
+    distance_right = 0
+    distance_up = 0
+    distance_down = 0
+    distance_uldiag = 0
+    distance_drdiag = 0
+    distance_urdiag = 0
+    distance_dldiag = 0
+
+    distances = []
+
+    for a in range(0, 4):  
+        if test % 5 == 0:
+            break
+        test -= 1
+        distance_left += 1
+    test = current
+
+    for b in range(0, 4):
+        if (test + 1) % 5 == 0:
+            break
+        test += 1
+        distance_right += 1
+    test = current
+    
+    for c in range(0, 4):
+        if test < 0:
+            break
+        test -= 5
+        distance_up += 1
+    test = current
+    
+    for d in range(0, 4):
+        if test > 24:
+            break
+        test += 5
+        distance_down += 1
+    test = current
+
+    for e in range(0,4):
+        if (test - 6) < 0 or test == 10 or test == 15 or test == 20:
+            break
+        test -= 6
+        distance_uldiag += 1
+    test = current
+
+    for f in range(0, 4):
+        if (test + 6) > 24 or test == 4 or test == 9 or test == 14:
+            break
+        test += 6
+        distance_drdiag += 1
+    test = current
+
+    for g in range(0,4):
+        if (test - 4) < 1 or test == 9 or test == 14 or test == 19 or test == 24:
+            break
+        test -= 4
+        distance_urdiag += 1
+    test = current
+
+    for h in range(0,4):
+        if test + 4 > 23 or test == 0 or test == 5 or test == 10 or test == 15:
+            break
+        test += 4
+        distance_dldiag += 1
+    
+    distances.append(distance_left)
+    distances.append(distance_right)
+    distances.append(distance_up)
+    distances.append(distance_down)
+    distances.append(distance_uldiag)
+    distances.append(distance_drdiag)
+    distances.append(distance_urdiag)
+    distances.append(distance_dldiag)
+    print(distances) 
+    return distances
+
+
+def movement(left, right, up, down, uldiag, drdiag, urdiag, dldiag, square):
     global red_turn
     move_set = []
+    limit_to_move = distance_to_edge(square)
 
     if not red_turn:
         up = -1 * up
         down = -1 * down
+        right = -1 * right
+        left = -1 * left
+        uldiag = -1 * uldiag
+        drdiag = -1 * drdiag
+        urdiag = -1 * urdiag
+        dldiag = -1 * dldiag
     
     move_set.append(square - left)
-    if square % 5 == 0:
+    if abs(left) == 1 and limit_to_move[0] < 1:
         move_set[0] = None
-    elif left == 2 and (square - 1) % 5 == 0:
+    elif abs(left) == 2 and limit_to_move[0] < 2:
         move_set[0] = None
     
     move_set.append(square + right)
-    if (square + 1) % 5 == 0:
+    if abs(right) == 1 and limit_to_move[1] > 1:
         move_set[1] = None
-    elif right == 2 and (square + 2) % 5 == 0:
+    elif abs(right) == 2 and limit_to_move[1] > 2:
         move_set[1] = None
 
     move_set.append(square + up)
     move_set.append(square - down)
+
+    move_set.append(square - (uldiag * 6))
+    move_set.append(square + (drdiag * 6))
+    move_set.append(square - (urdiag * 4))
+    move_set.append(square + (dldiag * 4))
 
     move_set = list(filter(None, move_set)) 
     return move_set
@@ -103,16 +196,18 @@ def possible_moves(begin):  # create list of what moves can be done based on wha
     
     #  depending what the current card order is add moves to set of what player can do
     if card_order[current_card] == ox:
-        pos_move_set.append(movement(0, 1, 5, 5, begin))
+        pos_move_set.append(movement(1, 0, 5, 5, 0, 0, 0, 0, begin))
     elif card_order[current_card] == tiger:
-        pos_move_set.append(movement(0, 0, 10, 5, begin))
+        pos_move_set.append(movement(0, 0, 10, 5, 0, 0, 0, 0, begin))
     elif card_order[current_card] == boar:
-        pos_move_set.append(movement(1, 1, 5, 0, begin)) 
+        pos_move_set.append(movement(1, 1, 5, 0, 0, 0, 0, 0, begin)) 
     elif card_order[current_card] == crab:
-        pos_move_set.append(movement(2, 2, 5, 0, begin))
+        pos_move_set.append(movement(2, 2, 5, 0, 0, 0, 0, 0, begin))
     elif card_order[current_card] == horse:
-        pos_move_set.append(movement(0, 1, 5, 5, begin))
-    pos_move_set.append(None)
+        pos_move_set.append(movement(0, 1, 5, 5, 0, 0, 0, 0, begin))
+    elif card_order[current_card] == monkey:
+        pos_move_set.append(movement(0, 0, 0, 0, 1, 1, 1, 1, begin))
+    # pos_move_set.append(None)
 
     pos_move_set = list(filter(None, pos_move_set))
     for b in range(0, len(pos_move_set)):
