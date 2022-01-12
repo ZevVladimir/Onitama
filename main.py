@@ -1,7 +1,7 @@
 import pygame
+import tkinter
+from tkinter import messagebox
 import sys
-
-from pygame.event import post
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -40,6 +40,7 @@ pygame.display.set_caption("Onitama")
 # create surface that is all white and smaller than window
 board = pygame.Surface((height - 1000, width - 1000))
 board.fill((255, 255, 255))
+
 
 # board that has all the positions and what should be displayed in each
 current_board = [red_student, red_student, red_master, red_student, red_student,
@@ -318,6 +319,7 @@ def check_mouse_pos(cur_x, cur_y, what_click):
 
 
 def win_game(winner):
+    tkinter.messagebox.showinfo("Game Over!", winner+ "won")
     print(winner + " won!")
 
 
@@ -335,11 +337,6 @@ def main():
                 pos = pygame.mouse.get_pos()
                 x, y = pos
                 check_mouse_pos(x, y, 1)
-
-            """ elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
-                pos = pygame.mouse.get_pos()
-                x, y = pos
-                check_mouse_pos(x, y, 3) """
 
         window.blit(board, board.get_rect())
         pygame.display.update()
