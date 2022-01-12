@@ -24,6 +24,7 @@ blue_master = ["b", "m"]
 empty_square = ["", ""]
 square_pos = []
 square_color = []
+highlight = []
 
 # load pictures for cards
 boar = pygame.image.load("boar.jpg")
@@ -71,17 +72,25 @@ def movement(left, right, up, down, square):
     move_set = []
 
     if not red_turn:
-        left = -1 * left
-        right = -1* right
         up = -1 * up
         down = -1 * down
-    if square != 0 and square != 5 and square != 10 and square != 15 and square != 20:
-        move_set.append(square - left)
+    
+    move_set.append(square - left)
+    if square % 5 == 0:
+        move_set[0] = None
+    elif left == 2 and (square - 1) % 5 == 0:
+        move_set[0] = None
+    
+    move_set.append(square + right)
+    if (square + 1) % 5 == 0:
+        move_set[1] = None
+    elif right == 2 and (square + 2) % 5 == 0:
+        move_set[1] = None
 
-    if square != 4 and square != 9 and square != 14 and square != 19 and square != 24:
-        move_set.append(square + right)
     move_set.append(square + up)
     move_set.append(square - down)
+
+    move_set = list(filter(None, move_set)) 
     return move_set
 
 # TODO figure out how to deal with squares on the sides 
@@ -93,7 +102,7 @@ def possible_moves(begin):  # create list of what moves can be done based on wha
     
     #  depending what the current card order is add moves to set of what player can do
     if card_order[current_card] == ox:
-        pos_move_set.append(movement(1, 0, 5, 5, begin))
+        pos_move_set.append(movement(0, 1, 5, 5, begin))
     elif card_order[current_card] == tiger:
         pos_move_set.append(movement(0, 0, 10, 5, begin))
     elif card_order[current_card] == boar:
@@ -126,6 +135,7 @@ def possible_moves(begin):  # create list of what moves can be done based on wha
 
 
 def update_board(color_order):
+    global current_card
     update_controller = 0
     half_size = size / 2
     quarter_size = size / 4
@@ -172,6 +182,7 @@ def update_board(color_order):
             window.blit(card_order_copy[m], (5 * size, m * size))
         if m == 2:
             window.blit(card_order_copy[m], (5.5 * size, m * size))
+        
 
 
 def move_piece(begin, finish, used):
@@ -179,10 +190,18 @@ def move_piece(begin, finish, used):
     global red_turn
     global card_order
     global square_color
+    winner = ""
 
     current_board[finish] = current_board[begin]
     current_board[begin] = empty_square
     
+    if red_turn and finish == 22:
+        winner = "Red"
+        win_game(winner)
+    elif not red_turn and finish == 2:
+        winner = "Blue"
+        win_game(winner)
+
     card_order_copy = card_order.copy()
     card_order[used] = card_order[2]
     card_order[2] = card_order_copy[used]
@@ -239,7 +258,7 @@ def check_mouse_pos(cur_x, cur_y, what_click):
     global current_card
     global square_color
     global current_piece
-    highlight = []
+    global highlight
     new_board = square_color.copy()
     # determines if the click was on one of the cards
 
@@ -264,16 +283,14 @@ def check_mouse_pos(cur_x, cur_y, what_click):
 
             if low_range_x <= cur_x <= high_range_x:
                 if low_range_y <= cur_y <= high_range_y:
-                    
-                    highlight = possible_moves(i)
                     if current_click == 1:
-                        print(check_piece_there(i))
+                        highlight.clear()
+                        highlight = possible_moves(i)
                         # if the click was on one of the squares and a card has been selected determine what piece is there
                         if check_piece_there(i):
                             highlight = possible_moves(i)
                             for j in range(0, len(highlight)):
                                 if current_card == 0 or current_card == 3:
-                                    print(highlight)
                                     new_board[highlight[j]] = ORANGE
                                 elif current_card == 1 or current_card == 4:
                                     new_board[highlight[j]] = PURPLE
@@ -292,7 +309,6 @@ def check_mouse_pos(cur_x, cur_y, what_click):
                             highlight = possible_moves(i)
                             for j in range(0, len(highlight)):
                                 if current_card == 0 or current_card == 3:
-                                    print(highlight)
                                     new_board[highlight[j]] = ORANGE
                                 elif current_card == 1 or current_card == 4:
                                     new_board[highlight[j]] = PURPLE
