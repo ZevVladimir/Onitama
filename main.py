@@ -16,7 +16,7 @@ size = 2000 / 5
 current_click = 0
 current_card = -1
 current_piece = 0
-red_turn = True  # defines that red starts first
+blue_turn = True  # defines that blue starts first
 listOfCenter = []
 red_student = ['r', 's']
 red_master = ["r", "m"]
@@ -130,11 +130,12 @@ def distance_to_edge(current):
 
     for e in range(0,4):
         if (test - 6) < 0 or test == 10 or test == 15 or test == 20:
+            print("here" + str(distance_uldiag))
             break
         test -= 6
         distance_uldiag += 1
     test = current
-
+    
     for f in range(0, 4):
         if (test + 6) > 24 or test == 4 or test == 9 or test == 14:
             break
@@ -163,16 +164,24 @@ def distance_to_edge(current):
     distances.append(distance_drdiag)
     distances.append(distance_urdiag)
     distances.append(distance_dldiag)
-    print(distances) 
+    # diagonals are swtiched when board is upside down
+    if not blue_turn:
+        distances_copy = distances.copy()
+        distances[0] = distances[1]
+        distances[1] = distances_copy[0]
+        distances[4] = distances[5]
+        distances[5] = distances_copy[4]
+        distances[6] = distances[7]
+        distances[7] = distances_copy[6]
     return distances
 
 
 def movement(left, right, up, down, uldiag, drdiag, urdiag, dldiag, square):
-    global red_turn
+    global blue_turn
     move_set = []
     limit_to_move = distance_to_edge(square)
 
-    if not red_turn:
+    if not blue_turn:
         up = -1 * up
         down = -1 * down
         right = -1 * right
@@ -182,26 +191,44 @@ def movement(left, right, up, down, uldiag, drdiag, urdiag, dldiag, square):
         urdiag = -1 * urdiag
         dldiag = -1 * dldiag
     
+    print(limit_to_move)
+    print("left: " + str(left))
+    print("right: " + str(right))
+    print("up: " + str(up))
+    print("down: " + str(down))
+    print("uldiag: " + str(uldiag))
+    print("drdiag: " + str(drdiag))
+    print("urdiag: " + str(urdiag))
+    print("dldiag: " + str(dldiag)) 
     move_set.append(square - left)
-    if abs(left) == 1 and limit_to_move[0] < 1:
+    if abs(left) == 1 and limit_to_move[0] <= 0:
         move_set[0] = None
-    elif abs(left) == 2 and limit_to_move[0] < 2:
+    elif abs(left) == 2 and limit_to_move[0] <= 1:
         move_set[0] = None
-    
+
     move_set.append(square + right)
-    if abs(right) == 1 and limit_to_move[1] > 1:
+    if abs(right) == 1 and limit_to_move[1] <= 0:
         move_set[1] = None
-    elif abs(right) == 2 and limit_to_move[1] > 2:
+    elif abs(right) == 2 and limit_to_move[1] <= 1:
         move_set[1] = None
 
-    move_set.append(square + up)
-    move_set.append(square - down)
+    move_set.append(square - (up * 5))
+
+    move_set.append(square + (down * 5))
 
     move_set.append(square - (uldiag * 6))
+    if limit_to_move[4] < 1:
+        move_set[4] = None
     move_set.append(square + (drdiag * 6))
+    if limit_to_move[5] < 1:
+        move_set[5] = None
     move_set.append(square - (urdiag * 4))
+    if limit_to_move[6] < 1:
+        move_set[6] = None
     move_set.append(square + (dldiag * 4))
-
+    if limit_to_move[7] < 1:
+        move_set[7] = None
+    print(move_set)
     move_set = list(filter(None, move_set)) 
     return move_set
 
@@ -215,13 +242,13 @@ def possible_moves(begin):  # create list of what moves can be done based on wha
     #  depending what the current card order is add moves to set of what player can do
     # order goes: left, right, up, down, up left diag, down right diag, up right diag, down left diag
     if card_order[current_card] == tiger:
-        pos_move_set.append(movement(0, 0, 10, 5, 0, 0, 0, 0, begin))
+        pos_move_set.append(movement(0, 0, 2, 1, 0, 0, 0, 0, begin))
     elif card_order[current_card] == frog:
         pos_move_set.append(movement(2, 0, 0, 0, 1, 1, 0, 0, begin))
     elif card_order[current_card] == rabbit:
         pos_move_set.append(movement(0, 2, 0, 0, 0, 0, 1, 1, begin))
     elif card_order[current_card] == crab:
-        pos_move_set.append(movement(2, 2, 5, 0, 0, 0, 0, 0, begin))
+        pos_move_set.append(movement(2, 2, 1, 0, 0, 0, 0, 0, begin))
     elif card_order[current_card] == elephant:
         pos_move_set.append(movement(1, 1, 0, 0, 1, 0, 1, 0, begin))
     elif card_order[current_card] == goose:
@@ -233,13 +260,13 @@ def possible_moves(begin):  # create list of what moves can be done based on wha
     elif card_order[current_card] == mantis:
         pos_move_set.append(movement(0, 0, 0, 1, 1, 0, 1, 0, begin))
     elif card_order[current_card] == horse:
-        pos_move_set.append(movement(0, 1, 5, 5, 0, 0, 0, 0, begin))
+        pos_move_set.append(movement(1, 0, 1, 1, 0, 0, 0, 0, begin))
     elif card_order[current_card] == ox:
-        pos_move_set.append(movement(1, 0, 5, 5, 0, 0, 0, 0, begin))
+        pos_move_set.append(movement(0, 1, 1, 1, 0, 0, 0, 0, begin))
     elif card_order[current_card] == crane:
         pos_move_set.append(movement(0, 0, 1, 0, 0, 1, 0, 1, begin))
     elif card_order[current_card] == boar:
-        pos_move_set.append(movement(1, 1, 5, 0, 0, 0, 0, 0, begin))
+        pos_move_set.append(movement(1, 1, 1, 0, 0, 0, 0, 0, begin))
     elif card_order[current_card] == eel:
         pos_move_set.append(movement(0, 1, 0, 0, 1, 0, 0, 1, begin))
     elif card_order[current_card] == cobra:
@@ -259,11 +286,11 @@ def possible_moves(begin):  # create list of what moves can be done based on wha
             full_move_set[d] = None
         elif full_move_set[d] > 24:
             full_move_set[d] = None
-        elif red_turn:
-            if current_board[full_move_set[d]] == red_master or current_board[full_move_set[d]] == red_student:
-                full_move_set[d] = None
-        elif not red_turn:
+        elif blue_turn:
             if current_board[full_move_set[d]] == blue_master or current_board[full_move_set[d]] == blue_student:
+                full_move_set[d] = None
+        elif not blue_turn:
+            if current_board[full_move_set[d]] == red_master or current_board[full_move_set[d]] == red_student:
                 full_move_set[d] = None
     
     full_move_set = list(filter(None, full_move_set))  # remove all the Nones
@@ -323,28 +350,35 @@ def update_board(color_order):
 
 def move_piece(begin, finish, used):
     global current_board
-    global red_turn
+    global blue_turn
     global card_order
     global square_color
     winner = ""
-
+    
+    current_board_copy = current_board.copy()
     current_board[finish] = current_board[begin]
     current_board[begin] = empty_square
     
-    if red_turn and finish == 22:
-        winner = "Red"
-        win_game(winner)
-    elif not red_turn and finish == 2:
-        winner = "Blue"
-        win_game(winner)
+    if blue_turn:
+        if current_board[2] == blue_master or current_board[2] == blue_student:
+            winner = "Blue won by capturing Red's dojo"
+        elif current_board_copy[finish] == red_master:
+            winner = "Blue won by capturing Red's master"
+    elif not blue_turn:
+        if current_board[22] == red_master or current_board[22] == red_student:
+            winner = "Red won by capturing Blue's dojo"
+        elif current_board_copy[finish] == blue_master:
+            winner = "Red won by capturing Blue's master"
 
     card_order_copy = card_order.copy()
     card_order[used] = card_order[2]
     card_order[2] = card_order_copy[used]
 
 
-    red_turn = not red_turn
+    blue_turn = not blue_turn
     update_board(square_color)
+    if winner != "":
+        win_game(winner)
 
 
 def check_piece_there(there):
@@ -353,37 +387,33 @@ def check_piece_there(there):
     global current_click
 
     if current_click < 2:
-        if red_turn:
+        if blue_turn:
             if current_board[there] == empty_square:
                 return False
             elif current_board[there] == red_student or current_board[there] == blue_student:
                 return True
-        if not red_turn:
+        if not blue_turn:
             if current_board[there] == empty_square:
                 return False
             elif current_board[there] == blue_student or current_board[there] == blue_master:
                 return True
        
     elif current_click == 2:
-        if red_turn:
+        if not blue_turn:
             if current_board[there] == empty_square:
                 return True
             elif current_board[there] == blue_student:
                 return True
             elif current_board[there] == blue_master:
-                win = "Red"
-                win_game(win)
                 return True
             elif current_board[there] == red_student or current_board[there] == red_master:
                 return False
-        if not red_turn:
+        if blue_turn:
             if current_board[there] == empty_square:
                 return True
             elif current_board[there] == red_student:
                 return True
             elif current_board[there] ==red_master:
-                win = "Blue"
-                win_game(win)
                 return True
             elif current_board[there] == blue_student or current_board[there] == blue_master:
                 return False
@@ -402,13 +432,13 @@ def check_mouse_pos(cur_x, cur_y, what_click):
         c_low_range_x, c_high_range_x = card_pos[k][0]
         c_low_range_y, c_high_range_y = card_pos[k][1]
         if c_low_range_x <= cur_x <= c_high_range_x and c_low_range_y <= cur_y <= c_high_range_y:
-            if red_turn and k < 2:
+            if blue_turn and k > 1:
                 current_click = 1
-                current_card = k
-                return k
-            if not red_turn and k > 1:
-                current_click = 1 
                 current_card = k + 1
+                return k
+            if not blue_turn and k < 2:
+                current_click = 1 
+                current_card = k 
                 return k
 
     # determines if the click was on one of the squares
@@ -455,7 +485,7 @@ def check_mouse_pos(cur_x, cur_y, what_click):
 
 def win_game(winner):
     tkinter.messagebox.showinfo("Game Over!", winner+ "won")
-    print(winner + " won!")
+    print(winner)
 
 
 def main():
