@@ -5,4 +5,8 @@ Trying to improve python skills and create relatively simple game.
 Using pygame
 
 What would make it nicer
-Better UI: restart game/new game, win game screen, show which card is chosen, show whose turn it is
+-Resizeable screen
+-Better UI 
+-Restart game/new game
+-Show which card is chosen
+-Show whose turn it is
