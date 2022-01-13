@@ -1,8 +1,16 @@
 import pygame
-import tkinter
-from tkinter import messagebox
+from tkinter import *
+from tkinter import Toplevel, messagebox
+from tkinter import ttk
 import random
 import sys
+
+win = Tk()
+def open_popup(winner):
+    win.geometry("1500x250")
+    win.title("Game Over!")
+    Label(win, text = winner, font=('Mistral 18 bold')).place(x = 150, y = 80)
+    win.mainloop()
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -378,7 +386,7 @@ def move_piece(begin, finish, used):
     blue_turn = not blue_turn
     update_board(square_color)
     if winner != "":
-        win_game(winner)
+        open_popup(winner)
 
 
 def check_piece_there(there):
@@ -480,12 +488,6 @@ def check_mouse_pos(cur_x, cur_y, what_click):
                                     new_board[highlight[j]] = PURPLE
                             current_piece = i
                             update_board(new_board)
-    
-
-
-def win_game(winner):
-    tkinter.messagebox.showinfo("Game Over!", winner+ "won")
-    print(winner)
 
 
 def main():
