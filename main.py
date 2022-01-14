@@ -138,7 +138,6 @@ def distance_to_edge(current):
 
     for e in range(0,4):
         if (test - 6) < 0 or test == 10 or test == 15 or test == 20:
-            print("here" + str(distance_uldiag))
             break
         test -= 6
         distance_uldiag += 1
@@ -198,16 +197,7 @@ def movement(left, right, up, down, uldiag, drdiag, urdiag, dldiag, square):
         drdiag = -1 * drdiag
         urdiag = -1 * urdiag
         dldiag = -1 * dldiag
-    
-    print(limit_to_move)
-    print("left: " + str(left))
-    print("right: " + str(right))
-    print("up: " + str(up))
-    print("down: " + str(down))
-    print("uldiag: " + str(uldiag))
-    print("drdiag: " + str(drdiag))
-    print("urdiag: " + str(urdiag))
-    print("dldiag: " + str(dldiag)) 
+
     move_set.append(square - left)
     if abs(left) == 1 and limit_to_move[0] <= 0:
         move_set[0] = None
@@ -236,7 +226,6 @@ def movement(left, right, up, down, uldiag, drdiag, urdiag, dldiag, square):
     move_set.append(square + (dldiag * 4))
     if limit_to_move[7] < 1:
         move_set[7] = None
-    print(move_set)
     move_set = list(filter(None, move_set)) 
     return move_set
 
@@ -307,6 +296,7 @@ def possible_moves(begin):  # create list of what moves can be done based on wha
 
 def update_board(color_order):
     global current_card
+    global current_board
     update_controller = 0
     half_size = size / 2
     quarter_size = size / 4
@@ -366,7 +356,6 @@ def move_piece(begin, finish, used):
     current_board_copy = current_board.copy()
     current_board[finish] = current_board[begin]
     current_board[begin] = empty_square
-    
     if blue_turn:
         if current_board[2] == blue_master or current_board[2] == blue_student:
             winner = "Blue won by capturing Red's dojo"
@@ -393,17 +382,18 @@ def check_piece_there(there):
     global start
     global origin
     global current_click
+    global current_board
 
     if current_click < 2:
         if blue_turn:
-            if current_board[there] == empty_square:
-                return False
-            elif current_board[there] == red_student or current_board[there] == blue_student:
-                return True
-        if not blue_turn:
-            if current_board[there] == empty_square:
+            if current_board[there] == empty_square or current_board[there] == red_student or current_board[there] == red_master:
                 return False
             elif current_board[there] == blue_student or current_board[there] == blue_master:
+                return True
+        if not blue_turn:
+            if current_board[there] == empty_square or current_board[there] == blue_student or current_board[there] == blue_master:
+                return False
+            elif current_board[there] == red_student or current_board[there] == red_master:
                 return True
        
     elif current_click == 2:
